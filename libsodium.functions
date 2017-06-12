@@ -1,0 +1,51 @@
+# This file is part of libertine linux's package libsodium. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/libsodium/master/COPYRIGHT. No part of libertine linux's package libsodium, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2016 The developers of libertine linux's package libsodium. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/libsodium/master/COPYRIGHT.
+
+
+variant=upstream
+
+depends build_ccache
+build_needs ccache
+
+depends build_gnumake
+build_needs make
+
+depends build_slibtool
+build_needs clibtool-static libtoolize realpath
+
+depends build_perl
+build_needs perl
+
+depends build_autoconf
+build_needs autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames
+
+depends build_automake
+build_needs automake aclocal
+
+depends build_gnum4
+build_needs m4
+
+depends build_musl_cross_make_host
+build_needs "$libertine_host"-cc "$libertine_host"-gcc "$libertine_host"-ar "$libertine_host"-ld "$libertine_host"-ranlib "$libertine_host"-strip
+
+depends build_busybox
+build_needs sort dirname install expr ls sleep
+
+build_needs sed rm sh ln
+libertine_compile_libsodium()
+{
+	pushd "$(libertine_public_sourcePath)"
+		
+		libtoolize --install --force --verbose
+		autoreconf --install --force --verbose
+
+		libertine_public_autoconf_modernAutoconfConfigure \
+				--enable-fast-install --disable-silent-rules --disable-dependency-tracking \
+				--disable-shared --enable-static
+
+		libertine_public_make
+
+		libertine_public_make DESTDIR="$(libertine_public_outputHostSysrootPath)" install
+
+	popd
+}
